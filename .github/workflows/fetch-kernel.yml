@@ -1,0 +1,55 @@
+name: Fetch M21 Kernel Source
+
+on:
+  workflow_dispatch:
+
+jobs:
+  fetch-source:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install gdown
+        run: pip3 install gdown
+
+      - name: Download Kernel
+        run: |
+          gdown 11oVHPgvUS5RGaPkuNZWBa2mIPaN96o8p -O /tmp/download.bin
+          file /tmp/download.bin
+          ls -lh /tmp/download.bin
+
+      - name: Extract Kernel
+        run: |
+          mkdir -p /tmp/stage1
+          unzip -o /tmp/download.bin -d /tmp/stage1
+          find /tmp/stage1 -maxdepth 3 -type f
+
+      - name: Extract Kernel.tar.gz
+        run: |
+          KERNEL_TAR=$(find /tmp/stage1 -iname "Kernel.tar.gz" | head -n1)
+          echo "Using archive: $KERNEL_TAR"
+          mkdir -p /tmp/stage2
+          tar -xzf "$KERNEL_TAR" -C /tmp/stage2
+          echo "---- stage2 top-level contents ----"
+          ls -la /tmp/stage2
+
+      - name: Flatten kernel source into repo root
+        run: |
+          shopt -s dotglob
+          # Wipe everything in repo root except .git and .github
+          find . -mindepth 1 -maxdepth 1 ! -name '.git' ! -name '.github' -exec rm -rf {} +
+          # Move kernel source (already flat, per your last log) into repo root
+          mv /tmp/stage2/* .
+          rm -rf /tmp/stage1 /tmp/stage2 /tmp/download.bin
+          ls -la
+
+      - name: Commit and push kernel source
+        run: |
+          git config user.name "nafis01aa"
+          git config user.email "nafis01aa@gmail.com"
+          git add -A
+          git commit -m "Add to M215FXXU2ATI9 kernel source" || echo "Nothing to commit"
+          git push
