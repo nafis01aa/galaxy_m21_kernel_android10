@@ -29,12 +29,6 @@ jobs:
           # Clone exact Clang version
           git clone --depth=1 https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86 -b android-9.0.0_r61 toolchains/clang
 
-      - name: Integrate ReSukiSU
-        run: |
-          rm -rf KernelSU drivers/kernelsu
-          echo "==== Downloading and Integrating ReSukiSU ===="
-          curl -LSs "https://raw.githubusercontent.com/ReSukiSU/ReSukiSU/main/kernel/setup.sh" | bash
-
       - name: Build the Kernel
         run: |
           WORKSPACE=$(pwd)
