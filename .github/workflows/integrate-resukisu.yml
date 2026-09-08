@@ -14,8 +14,9 @@ jobs:
 
       - name: Remove any KernelSU before setup
         run: |
-          rm -rf KernelSU drivers/kernelsu
+          rm -rf KernelSU drivers/kernelsu .gitmodules
           git rm -r --cached KernelSU 2>/dev/null || true
+          git submodule add https://github.com/ReSukiSU/ReSukiSU KernelSU
 
       - name: Run KernelSU (ReSukiSU) script
         run: |
