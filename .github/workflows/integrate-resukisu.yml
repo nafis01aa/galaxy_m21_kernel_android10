@@ -1,0 +1,37 @@
+name: Integrate ReSukiSU
+
+on:
+  workflow_dispatch:
+
+jobs:
+  integrate-resukisu:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Remove any KernelSU before setup
+        run: |
+          rm -rf KernelSU drivers/kernelsu
+          git rm -r --cached KernelSU 2>/dev/null || true
+
+      - name: Run KernelSU (ReSukiSU) script
+        run: |
+          curl -LSs "https://raw.githubusercontent.com/ReSukiSU/ReSukiSU/main/kernel/setup.sh" | bash
+
+      - name: Verify KernelSU
+        run: |
+          echo "---- KernelSU folder contents ----"
+          find KernelSU -maxdepth 1 | head -20
+          echo "---- File count ----"
+          find KernelSU -type f | wc -l
+
+      - name: Commit and push KernelSU
+        run: |
+          git config user.name "nafis01aa"
+          git config user.email "nafis01aa@gmail.com"
+          git add -A
+          git commit -m "Integrate KernelSU" || echo "Nothing to commit"
+          git push
