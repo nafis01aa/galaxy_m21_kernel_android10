@@ -38,11 +38,7 @@ jobs:
       - name: Build the Kernel
         run: |
           WORKSPACE=$(pwd)
-          
-          # Fix SELinux classmap.h error for newer host glibc
-          echo "==== Patching SELinux classmap ===="
-          sed -i 's/#if PF_MAX > 44/#if PF_MAX > 64/' security/selinux/include/classmap.h
-          
+
           MAKE_ARGS="ARCH=arm64 \
             ANDROID_MAJOR_VERSION=q \
             CROSS_COMPILE=$WORKSPACE/toolchains/gcc/bin/aarch64-linux-android- \
